@@ -413,3 +413,24 @@
 - feat: add maybePop
 - feat: add pushReplace
 - refactor: rm replaceOnly
+
+## 3.5.1
+
+- feat: url template support optional params
+
+## 3.5.2
+
+- feat: 优化 Android 引擎释放的逻辑
+- fix: 修复 iOS 在混合栈的场景只有一个页面时无法 pop 的问题
+
+## 3.5.3
+
+- fix: 修复 NavigatorRoutePush 在首页时不生效的问题
+
+## 3.6.0
+
+- feat: NavigatorRoutePush handle with multiple url
+
+## 3.6.1
+
+- fix: 修复 NavigatorPageView 互相嵌套内部的 didAppear 不触发的问题
