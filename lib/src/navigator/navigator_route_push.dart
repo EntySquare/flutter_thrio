@@ -27,12 +27,12 @@ import '../module/module_anchor.dart';
 class NavigatorRoutePush extends StatefulWidget {
   const NavigatorRoutePush({
     super.key,
-    required this.url,
+    required this.urls,
     required this.onPush,
     required this.child,
   });
 
-  final String url;
+  final List<String> urls;
   final NavigatorRoutePushHandle onPush;
   final Widget child;
 
@@ -42,6 +42,20 @@ class NavigatorRoutePush extends StatefulWidget {
 
 class _NavigatorRoutePushState extends State<NavigatorRoutePush> {
   VoidCallback? _registry;
+  final _handles = <String, NavigatorRoutePushHandle>{};
+
+  @override
+  void initState() {
+    super.initState();
+    if (mounted) {
+      _registry?.call();
+      _handles.clear();
+      for (final url in widget.urls) {
+        _handles[url] = widget.onPush;
+      }
+      _registry = anchor.pushHandlers.registryAll(_handles);
+    }
+  }
 
   @override
   void dispose() {
@@ -53,7 +67,7 @@ class _NavigatorRoutePushState extends State<NavigatorRoutePush> {
   Widget build(final BuildContext context) => NavigatorPageLifecycle(
         didAppear: (final _) {
           _registry?.call();
-          _registry = anchor.pushHandlers.registry(widget.url, widget.onPush);
+          _registry = anchor.pushHandlers.registryAll(_handles);
         },
         didDisappear: (final _) {
           _registry?.call();
