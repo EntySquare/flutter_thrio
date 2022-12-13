@@ -23,7 +23,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:uri/uri.dart';
 
 import '../channel/thrio_channel.dart';
 import '../exception/thrio_exception.dart';
@@ -118,7 +117,7 @@ class ThrioNavigatorImplement {
 
   void ready() => _channel.invokeMethod<bool>('ready');
 
-  Future<TPopParams> push<TParams, TPopParams>({
+  Future<TPopParams?> push<TParams, TPopParams>({
     required final String url,
     final TParams? params,
     final bool animated = true,
@@ -135,17 +134,17 @@ class ThrioNavigatorImplement {
       );
     }
 
-    final completer = Completer<TPopParams>();
+    final completer = Completer<TPopParams?>();
     _sendChannel.push<TParams>(url: url, params: params, animated: animated).then((final index) {
       if (index > 0) {
         final routeName = '$index $url';
         final routeHistory = ThrioNavigatorImplement.shared().navigatorState?.history;
         final route = routeHistory?.lastWhereOrNull((final it) => it.settings.name == routeName);
         if (route != null && route is NavigatorRoute) {
-          route.poppedResult = (final params) => poppedResult<TPopParams>(completer, params);
+          route.poppedResult = (final params) => poppedResult<TPopParams?>(completer, params);
         } else {
           // 不在当前页面栈上，则通过name来缓存
-          poppedResults[routeName] = (final params) => poppedResult<TPopParams>(completer, params);
+          poppedResults[routeName] = (final params) => poppedResult<TPopParams?>(completer, params);
         }
       }
       result?.call(index);
@@ -156,14 +155,16 @@ class ThrioNavigatorImplement {
   MapEntry<Uri, NavigatorRouteCustomHandler>? matchRouteCustomHandle(final String url) {
     for (final key in anchor.customHandlers.keys) {
       final uri = Uri.parse(url);
-      if (key.scheme == uri.scheme && key.host == uri.host && key.parser.matches(uri)) {
+      if ((key.scheme.isEmpty || key.scheme == uri.scheme) &&
+          (key.host.isEmpty || key.host == uri.host) &&
+          (key.parser == null || key.parser!.matches(uri))) {
         return MapEntry(uri, anchor.customHandlers[key]!);
       }
     }
     return null;
   }
 
-  Future<TPopParams> onRouteCustomHandle<TPopParams>({
+  Future<TPopParams?> onRouteCustomHandle<TPopParams>({
     required final NavigatorRouteCustomHandler handler,
     required final Uri uri,
     final dynamic params,
@@ -178,13 +179,13 @@ class ThrioNavigatorImplement {
         result: result,
       );
 
-  Future<TPopParams> pushSingle<TParams, TPopParams>({
+  Future<TPopParams?> pushSingle<TParams, TPopParams>({
     required final String url,
     final TParams? params,
     final bool animated = true,
     final NavigatorIntCallback? result,
   }) {
-    final completer = Completer<TPopParams>();
+    final completer = Completer<TPopParams?>();
 
     _sendChannel
         .push<TParams>(url: url, params: params, animated: animated)
@@ -205,7 +206,7 @@ class ThrioNavigatorImplement {
     return completer.future;
   }
 
-  Future<TPopParams> pushReplace<TParams, TPopParams>({
+  Future<TPopParams?> pushReplace<TParams, TPopParams>({
     required final String url,
     final TParams? params,
     final bool animated = true,
@@ -249,17 +250,68 @@ class ThrioNavigatorImplement {
     return completer.future;
   }
 
-  void poppedResult<TPopParams>(final Completer<TPopParams> completer, final dynamic params) {
+  Future<TPopParams?> pushAndRemoveTo<TParams, TPopParams>({
+    required final String url,
+    required final String toUrl,
+    final TParams? params,
+    final bool animated = true,
+    final NavigatorIntCallback? result,
+  }) async {
+    final allSettings = (await allRoutes()).reversed;
+    if (allSettings.firstWhereOrNull((final it) => it.url == toUrl) == null) {
+      result?.call(0);
+      return null;
+    }
+    final match = matchRouteCustomHandle(url);
+    if (match != null) {
+      final poppedResult = await onRouteCustomHandle<TPopParams>(
+        handler: match.value,
+        uri: match.key,
+        params: params,
+        animated: animated,
+        result: result,
+      );
+      for (final setting in allSettings) {
+        if (setting.url == toUrl) {
+          break;
+        }
+        await remove(url: setting.url!, index: setting.index);
+      }
+      return poppedResult;
+    }
+
+    final completer = Completer<TPopParams>();
+    unawaited(_sendChannel
+        .push<TParams>(url: url, params: params, animated: animated)
+        .then((final index) async {
+      if (index > 0) {
+        final routeName = '$index $url';
+        final routeHistory = ThrioNavigatorImplement.shared().navigatorState?.history;
+        final route = routeHistory?.lastWhereOrNull((final it) => it.settings.name == routeName);
+        if (route != null && route is NavigatorRoute) {
+          route.poppedResult = (final params) => poppedResult<TPopParams>(completer, params);
+        } else {
+          // 不在当前页面栈上，则通过name来缓存
+          poppedResults[routeName] = (final params) => poppedResult<TPopParams>(completer, params);
+        }
+        for (final setting in allSettings) {
+          if (setting.url == toUrl) {
+            break;
+          }
+          await remove(url: setting.url!, index: setting.index);
+        }
+      }
+      result?.call(index);
+    }));
+    return completer.future;
+  }
+
+  void poppedResult<TPopParams>(final Completer<TPopParams?> completer, final dynamic params) {
     if (completer.isCompleted) {
       return;
     }
     if (params == null) {
-      final ts = TPopParams.toString();
-      if (ts == 'dynamic' || ts.contains('?')) {
-        completer.complete(null);
-      } else {
-        completer.completeError(ArgumentError('invalid params: $params', 'params'));
-      }
+      completer.complete(null);
     } else if (params is TPopParams) {
       completer.complete(params);
     } else {
