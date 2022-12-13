@@ -152,7 +152,7 @@ abstract class ThrioNavigator {
         animated: animated,
       );
 
-  /// Pop the page in the navigation stack until the page with `url`.
+  /// Pop the page in the navigation stack until the last page with `url`.
   ///
   static Future<bool> popTo({
     required final String url,
@@ -165,6 +165,33 @@ abstract class ThrioNavigator {
         animated: animated,
       );
 
+  /// Pop the page in the navigation stack until the first page with `url`.
+  ///
+  static Future<bool> popToFirst({
+    required final String url,
+    final bool animated = true,
+  }) =>
+      ThrioNavigatorImplement.shared().popToFirst(
+        url: url,
+        animated: animated,
+      );
+
+  /// Pop the page in the navigation stack until the last page with `url` satisfies the `predicate`.
+  ///
+  static Future<bool> popUntil({
+    required final bool Function(String url) predicate,
+    final bool animated = true,
+  }) =>
+      ThrioNavigatorImplement.shared().popUntil(predicate: predicate, animated: animated);
+
+  /// Pop the page in the navigation stack until the first page with `url` satisfies the `predicate`.
+  ///
+  static Future<bool> popUntilFirst({
+    required final bool Function(String url) predicate,
+    final bool animated = true,
+  }) =>
+      ThrioNavigatorImplement.shared().popUntilFirst(predicate: predicate, animated: animated);
+
   /// Remove the page with `url` in the navigation stack.
   ///
   static Future<bool> remove({
@@ -175,6 +202,30 @@ abstract class ThrioNavigator {
       ThrioNavigatorImplement.shared().remove(
         url: url,
         index: index,
+        animated: animated,
+      );
+
+  /// Remove pages below the last page in the navigation stack.
+  /// Until the last page with `url` satisfies the `predicate`.
+  ///
+  static Future<bool> removeBlowUntil({
+    required final bool Function(String url) predicate,
+    final bool animated = true,
+  }) =>
+      ThrioNavigatorImplement.shared().removeBlowUntil(
+        predicate: predicate,
+        animated: animated,
+      );
+
+  /// Remove pages below the last page  in the navigation stack.
+  /// Until the first page with `url` satisfies the `predicate`.
+  ///
+  static Future<bool> removeBlowUntilFirst({
+    required final bool Function(String url) predicate,
+    final bool animated = true,
+  }) =>
+      ThrioNavigatorImplement.shared().removeBlowUntilFirst(
+        predicate: predicate,
         animated: animated,
       );
 
