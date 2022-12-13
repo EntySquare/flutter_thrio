@@ -22,7 +22,7 @@ class FlutterThrioPlugin : FlutterPlugin , MethodCallHandler{
             flutterPluginBinding
                 .platformViewRegistry
                 .registerViewFactory(
-                    "come.entysqure.mage",it
+                    "com.entysquare.mage",it
                 )
         }
     }
