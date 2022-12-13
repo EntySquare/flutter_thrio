@@ -32,7 +32,7 @@ abstract class ThrioNavigator {
   /// If a native page builder exists for the `url`, open the native page,
   /// otherwise open the flutter page.
   ///
-  static Future<TPopParams> push<TParams, TPopParams>({
+  static Future<TPopParams?> push<TParams, TPopParams>({
     required final String url,
     final TParams? params,
     final bool animated = true,
@@ -50,7 +50,7 @@ abstract class ThrioNavigator {
   /// If a native page builder exists for the `url`, open the native page,
   /// otherwise open the flutter page.
   ///
-  static Future<TPopParams> pushSingle<TParams, TPopParams>({
+  static Future<TPopParams?> pushSingle<TParams, TPopParams>({
     required final String url,
     final TParams? params,
     final bool animated = true,
@@ -68,7 +68,7 @@ abstract class ThrioNavigator {
   /// If a native page builder exists for the `url`, open the native page,
   /// otherwise open the flutter page.
   ///
-  static Future<TPopParams> pushReplace<TParams, TPopParams>({
+  static Future<TPopParams?> pushReplace<TParams, TPopParams>({
     required final String url,
     final TParams? params,
     final bool animated = true,
@@ -76,6 +76,26 @@ abstract class ThrioNavigator {
   }) =>
       ThrioNavigatorImplement.shared().pushReplace<TParams, TPopParams>(
         url: url,
+        params: params,
+        animated: animated,
+        result: result,
+      );
+
+  /// Push the page onto the navigation stack, and remove until the page.
+  ///
+  /// If a native page builder exists for the `url`, open the native page,
+  /// otherwise open the flutter page.
+  ///
+  static Future<TPopParams?> pushAndRemoveTo<TParams, TPopParams>({
+    required final String url,
+    required final String toUrl,
+    final TParams? params,
+    final bool animated = true,
+    final NavigatorIntCallback? result,
+  }) =>
+      ThrioNavigatorImplement.shared().pushAndRemoveTo<TParams, TPopParams>(
+        url: url,
+        toUrl: toUrl,
         params: params,
         animated: animated,
         result: result,

@@ -434,3 +434,13 @@
 ## 3.6.1
 
 - fix: 修复 NavigatorPageView 互相嵌套内部的 didAppear 不触发的问题
+
+## 3.6.2
+
+- feat: url template support only scheme
+
+## 3.7.0
+
+- feat: add pushAndRemoveTo
+- refactor: push return type nullable
+- fix: NavigatorRoutePush not working when enter foreground
