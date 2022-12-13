@@ -36,8 +36,9 @@ mixin ModuleRouteCustomHandler on ThrioModule {
   @protected
   VoidCallback registerRouteCustomHandler(
     final String template,
-    final NavigatorRouteCustomHandler handler,
-  ) {
+    final NavigatorRouteCustomHandler handler, {
+    final bool queryParamsAreOptional = false,
+  }) {
     var scheme = '';
     var host = '';
     var tem = template;
@@ -47,13 +48,16 @@ mixin ModuleRouteCustomHandler on ThrioModule {
     } else if (parts.length == 2) {
       scheme = parts[0].toLowerCase();
       final subParts = parts[1].split('/');
-      if (parts.length < 2) {
-        throw ThrioException('inivalid template: $template');
-      }
       host = subParts[0];
-      tem = '/${subParts[1]}';
+      if (subParts.length > 1) {
+        tem = '/${subParts.getRange(1, subParts.length).join('/')}';
+      } else {
+        tem = '';
+      }
     }
-    final parser = UriParser(UriTemplate(tem));
+    final parser = tem.isEmpty
+        ? null
+        : UriParser(UriTemplate(tem), queryParamsAreOptional: queryParamsAreOptional);
     final key = NavigatorUrlTemplate(scheme: scheme, host: host, parser: parser);
     if (anchor.customHandlers.keys.contains(key)) {
       throw ThrioException('duplicate url template: $template');

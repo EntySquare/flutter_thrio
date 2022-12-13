@@ -57,7 +57,7 @@ class _Flutter4PageState extends State<Flutter6Page> {
             ),
             InkWell(
               onTap: () async {
-                final result = await ThrioNavigator.push(url: 'justascheme://open/home?tab=0');
+                final result = await ThrioNavigator.push(url: 'justascheme://open/biz2/home?tab=0');
                 debugPrint(result.toString());
               },
               child: Container(
@@ -72,7 +72,7 @@ class _Flutter4PageState extends State<Flutter6Page> {
             InkWell(
               onTap: () async {
                 final result = await ThrioNavigator.push(
-                    url: 'anotherScheme://leaderboard/home?hashId=13131973173&product=good');
+                    url: 'anotherScheme://leaderboard/home?hashId=13131973173');
                 debugPrint(result.toString());
               },
               child: Container(
@@ -81,6 +81,37 @@ class _Flutter4PageState extends State<Flutter6Page> {
                   color: Colors.yellow,
                   child: const Text(
                     'test deeplink multi queryParams',
+                    style: TextStyle(fontSize: 22, color: Colors.black),
+                  )),
+            ),
+            InkWell(
+              onTap: () async {
+                final result = await ThrioNavigator.push(url: 'https://www.google.com');
+                debugPrint(result.toString());
+              },
+              child: Container(
+                  padding: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(8),
+                  color: Colors.yellow,
+                  child: const Text(
+                    'test deeplink multi queryParams',
+                    style: TextStyle(fontSize: 22, color: Colors.black),
+                  )),
+            ),
+            InkWell(
+              onTap: () async {
+                final result = await ThrioNavigator.pushAndRemoveTo(
+                  url: root.biz1.flutter7.url,
+                  toUrl: root.biz1.flutter1.url,
+                );
+                debugPrint(result.toString());
+              },
+              child: Container(
+                  padding: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.all(8),
+                  color: Colors.yellow,
+                  child: const Text(
+                    'push flutter7 and remove to flutter1',
                     style: TextStyle(fontSize: 22, color: Colors.black),
                   )),
             ),
