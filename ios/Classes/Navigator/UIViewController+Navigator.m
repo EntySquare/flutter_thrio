@@ -150,16 +150,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)thrio_new_notifyUrl:(NSString *_Nullable)url
                   index:(NSNumber *_Nullable)index
                    name:(NSString *)name
-                 params:(id _Nullable)params {
+                     params:(id _Nullable)params {
     BOOL isMatch = NO;
-
+    
     NavigatorPageRoute *last = self.thrio_lastRoute;
     do {
         [last addNotify:name params:params];
         [self thrio_onNotify:last];
     } while ((last = last.prev));
-
+    
     return isMatch;
+}
 
 - (void)thrio_maybePopParams:(id _Nullable)params
                     animated:(BOOL)animated
