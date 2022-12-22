@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_thrio/flutter_thrio.dart';
 
-import 'pages/module.dart';
+import 'module.dart';
 
 void main() => runApp(const MainApp());
 void biz1() => runApp(const MainApp(entrypoint: 'biz1'));
 void biz2() => runApp(const MainApp(entrypoint: 'biz2'));
 
 class MainApp extends StatefulWidget {
-  const MainApp({super.key, final String entrypoint = 'main'}) : _entrypoint = entrypoint;
+  const MainApp({super.key, final String entrypoint = 'main'})
+      : _entrypoint = entrypoint;
 
   final String _entrypoint;
 

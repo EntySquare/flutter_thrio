@@ -31,7 +31,8 @@ extension NavigatorRouteSettings on RouteSettings {
     final int index = 0,
     final dynamic params,
   }) =>
-      RouteSettings(name: '$index $url', arguments: <String, dynamic>{'params': params});
+      RouteSettings(
+          name: '$index $url', arguments: <String, dynamic>{'params': params});
 
   /// Converting arguments to route settings.
   ///
@@ -53,7 +54,8 @@ extension NavigatorRouteSettings on RouteSettings {
     return null;
   }
 
-  static RouteSettings? fromNewUrlArguments(final Map<String, dynamic>? arguments) {
+  static RouteSettings? fromNewUrlArguments(
+      final Map<String, dynamic>? arguments) {
     if ((arguments != null && arguments.isNotEmpty) &&
         arguments.containsKey('newUrl') &&
         arguments.containsKey('newIndex')) {
@@ -62,7 +64,9 @@ extension NavigatorRouteSettings on RouteSettings {
       final indexValue = arguments['newIndex'];
       final index = indexValue is int ? indexValue : null;
       final isNested = arguments['isNested'] == true;
-      return RouteSettings(name: '$index $url', arguments: <String, dynamic>{'isNested': isNested});
+      return RouteSettings(
+          name: '$index $url',
+          arguments: <String, dynamic>{'isNested': isNested});
     }
     return null;
   }
@@ -73,16 +77,20 @@ extension NavigatorRouteSettings on RouteSettings {
         'params': params,
       };
 
-  String? get url {
+  String get url {
     final settingsName = name;
-    return settingsName == null || settingsName.isEmpty || !settingsName.contains(' ')
-        ? null
+    return settingsName == null ||
+            settingsName.isEmpty ||
+            !settingsName.contains(' ')
+        ? ''
         : settingsName.split(' ').last;
   }
 
   int get index {
     final settingsName = name;
-    return settingsName == null || settingsName.isEmpty || !settingsName.contains(' ')
+    return settingsName == null ||
+            settingsName.isEmpty ||
+            !settingsName.contains(' ')
         ? 0
         : int.tryParse(settingsName.split(' ').first) ?? 0;
   }

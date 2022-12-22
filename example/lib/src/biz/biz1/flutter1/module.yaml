@@ -1,0 +1,32 @@
+type:
+
+module:
+
+context:
+  declaration:
+
+  definition:
+
+notify:
+  - flutter1:
+      doc: 通知 flutter1
+      parameter:
+        - intValue:
+            type: int
+
+action:
+  - getPeople:
+      doc: get people
+      return: People
+      parameter:
+        - intValue:
+            type: int?
+
+  - getString:
+      doc: get string
+      return: String
+      parameter:
+        - boolValue:
+            type: bool
+
+push:

@@ -31,12 +31,14 @@ import '../navigator/navigator_types.dart';
 import '../navigator/navigator_url_template.dart';
 import '../navigator/thrio_navigator_implement.dart';
 import '../registry/registry_map.dart';
+import '../registry/registry_order_map.dart';
 import '../registry/registry_set_map.dart';
 import 'module_json_deserializer.dart';
 import 'module_json_serializer.dart';
 import 'module_page_builder.dart';
 import 'module_page_observer.dart';
 import 'module_param_scheme.dart';
+import 'module_route_action.dart';
 import 'module_route_builder.dart';
 import 'module_route_observer.dart';
 import 'module_route_transitions_builder.dart';
@@ -57,7 +59,8 @@ class ModuleAnchor
         ModuleRouteTransitionsBuilder {
   /// Holds PageObserver registered by `NavigatorPageLifecycle`.
   ///
-  final pageLifecycleObservers = RegistrySetMap<String, NavigatorPageObserver>();
+  final pageLifecycleObservers =
+      RegistrySetMap<String, NavigatorPageObserver>();
 
   /// Holds PushHandler registered by `NavigatorRoutePush` .
   ///
@@ -65,7 +68,8 @@ class ModuleAnchor
 
   /// A collection of route handlers for matching the key's pattern.
   ///
-  final customHandlers = RegistryMap<NavigatorUrlTemplate, NavigatorRouteCustomHandler>();
+  final routeCustomHandlers =
+      RegistryOrderMap<NavigatorUrlTemplate, NavigatorRouteCustomHandler>();
 
   /// All registered urls.
   ///
@@ -86,8 +90,9 @@ class ModuleAnchor
   }
 
   Future<dynamic> unloading(final Iterable<NavigatorRoute> allRoutes) async {
-    final urls = allRoutes.map<String>((final it) => it.settings.url!).toSet();
-    final notPushedUrls = allUrls.where((final it) => !urls.contains(it)).toList();
+    final urls = allRoutes.map<String>((final it) => it.settings.url).toSet();
+    final notPushedUrls =
+        allUrls.where((final it) => !urls.contains(it)).toList();
     // 需要过滤掉不带 home 的 url
     for (var i = notPushedUrls.length - 1; i >= 0; i--) {
       final url = notPushedUrls[i];
@@ -104,8 +109,9 @@ class ModuleAnchor
     for (final url in notPushedUrls) {
       modules.addAll(_getModules(url: url));
     }
-    final notPushedModules =
-        modules.where((final it) => it is ModulePageBuilder && it.pageBuilder != null).toSet();
+    final notPushedModules = modules
+        .where((final it) => it is ModulePageBuilder && it.pageBuilder != null)
+        .toSet();
     for (final module in notPushedModules) {
       // 页 Module onModuleUnloading
       if (module.isLoaded) {
@@ -178,15 +184,30 @@ class ModuleAnchor
             if (it.routeTransitionsDisabled) {
               return null;
             }
-            if (!it.routeTransitionsDisabled && it.routeTransitionsBuilder != null) {
+            if (!it.routeTransitionsDisabled &&
+                it.routeTransitionsBuilder != null) {
               return it.routeTransitionsBuilder as T;
+            }
+          }
+        }
+        return null;
+      } else if (typeString == (NavigatorRouteAction).toString()) {
+        if (modules.isEmpty || key == null) {
+          return null;
+        }
+        for (final it in modules.reversed) {
+          if (it is ModuleRouteAction) {
+            final routeAction = it.getRouteAction(key);
+            if (routeAction != null) {
+              return routeAction as T;
             }
           }
         }
         return null;
       }
     }
-    if (modules.isEmpty && (url == null || url.isEmpty || !ThrioModule.contains(url))) {
+    if (modules.isEmpty &&
+        (url == null || url.isEmpty || !ThrioModule.contains(url))) {
       modules = _getModules();
     }
 
@@ -223,7 +244,8 @@ class ModuleAnchor
     return <T>[];
   }
 
-  void set<T>(final Comparable<dynamic> key, final T value) => setParam(key, value);
+  void set<T>(final Comparable<dynamic> key, final T value) =>
+      setParam(key, value);
 
   T remove<T>(final Comparable<dynamic> key) => removeParam(key);
 
@@ -239,9 +261,34 @@ class ModuleAnchor
       return allModules..addAll(_getAllModules(firstModule));
     }
 
-    final components = url.isEmpty ? <String>[] : url.replaceAll('/', ' ').trim().split(' ');
+    final components =
+        url.isEmpty ? <String>[] : url.replaceAll('/', ' ').trim().split(' ');
     final length = components.length;
-    late ThrioModule? module = firstModule;
+    ThrioModule? module = firstModule;
+    // 确定根节点，根部允许连续的空节点
+    if (components.isNotEmpty) {
+      final key = components.removeAt(0);
+      var m = module.modules[key];
+      if (m == null) {
+        m = module.modules[''];
+        while (m != null) {
+          allModules.add(m);
+          final m0 = m.modules[key];
+          if (m0 == null) {
+            m = m.modules[''];
+          } else {
+            m = m0;
+            break;
+          }
+        }
+      }
+      if (m == null) {
+        return allModules;
+      }
+      module = m;
+      allModules.add(module);
+    }
+    // 寻找剩余的节点
     while (components.isNotEmpty) {
       final key = components.removeAt(0);
       module = module?.modules[key];
@@ -251,7 +298,7 @@ class ModuleAnchor
     }
 
     // url 不能完全匹配到 module，可能是原生的 url 或者不存在的 url
-    if (allModules.length != length + 1) {
+    if (allModules.where((final it) => it.key.isNotEmpty).length != length) {
       return <ThrioModule>[];
     }
 

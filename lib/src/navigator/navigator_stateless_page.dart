@@ -24,12 +24,13 @@ import 'package:flutter/widgets.dart';
 import '../module/thrio_module.dart';
 import 'navigator_page.dart';
 
-abstract class NavigatorStatelessPage extends StatelessWidget with NavigatorPage {
+abstract class NavigatorStatelessPage extends StatelessWidget
+    with NavigatorPage {
   const NavigatorStatelessPage({
     super.key,
     required this.moduleContext,
     this.params,
-    this.url,
+    required this.url,
     this.index = 0,
   });
 
@@ -40,7 +41,7 @@ abstract class NavigatorStatelessPage extends StatelessWidget with NavigatorPage
   final dynamic params;
 
   @override
-  final String? url;
+  final String url;
 
   @override
   final int index;

@@ -463,4 +463,58 @@
 
 ## 3.8.1
 
-- tabview支持child定制
+- feat: tabview支持child定制
+
+## 3.8.2
+
+- feat: 支持多个根部 module 为空的 key 的情况
+
+## 3.8.3
+
+- fix: 修复 NavigatorRoutePush 在首页时进入后台再回来的偶发不生效的问题
+
+## 3.8.4
+
+- feat: android onBackPressed = maybePop 
+
+## 3.8.5
+
+- fix: url template requires a path match
+
+## 3.8.6
+
+- fix: url template match only path
+
+## 3.8.7
+
+- fix: pushReplace not working with custom route handler 
+
+## 3.8.8
+
+- fix: remove callback invalid
+
+## 3.9.0
+
+- feat: add NavigatorRouteAction and remove uri.dart
+- feat: support route-action code generate
+
+## 3.9.1
+
+- feat: route-action 支持通过传入模板来表明参数已正确传入
+
+## 3.9.2
+
+- feat: route-custom-handler support domain name wildcard
+
+## 3.9.3
+
+- feat: add method [NavigatorPage.of]
+
+## 3.9.4
+
+- feat: add [NavigatorPage.moduleOf],[NavigatorPage.paramsOf],[NavigatorPage.urlOf],[NavigatorPage.indexOf].
+- refactor: RouteSettings.url to not nullable property.
+
+## 3.9.5
+
+- feat: public method [NavigatorPage.of]

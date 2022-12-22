@@ -64,17 +64,19 @@ class _NavigatorPageLifecycleState extends State<NavigatorPageLifecycle> {
       widget.didDisappear != null;
 
   @override
-  void activate() {
-    final state = context.tryStateOf<NavigatorWidgetState>();
-    final route = widget.url == null
-        ? state?.history.last
-        : state?.history
-            .lastWhereOrNull((final it) => it is NavigatorRoute && it.settings.url == widget.url);
-    if (route != null && route is NavigatorRoute) {
-      widget.willAppear?.call(route.settings);
-      widget.didAppear?.call(route.settings);
+  void initState() {
+    super.initState();
+    if (mounted) {
+      final state = context.tryStateOf<NavigatorWidgetState>();
+      final route = widget.url == null
+          ? state?.history.last
+          : state?.history.lastWhereOrNull((final it) =>
+              it is NavigatorRoute && it.settings.url == widget.url);
+      if (route != null && route is NavigatorRoute) {
+        widget.willAppear?.call(route.settings);
+        widget.didAppear?.call(route.settings);
+      }
     }
-    super.activate();
   }
 
   @override
@@ -91,7 +93,7 @@ class _NavigatorPageLifecycleState extends State<NavigatorPageLifecycle> {
           _route = route;
 
           _pageObserverCallback = anchor.pageLifecycleObservers.registry(
-            route.settings.url!,
+            route.settings.url,
             _PageLifecyclePageObserver(this),
           );
         }

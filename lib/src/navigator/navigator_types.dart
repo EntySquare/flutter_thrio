@@ -34,6 +34,10 @@ typedef NavigatorRouteBuilder = NavigatorRoute Function(
   RouteSettings settings,
 );
 
+/// Signature of callbacks with bool parameter.
+///
+typedef NavigatorBoolCallback = void Function(bool result);
+
 /// Signature of callbacks with int parameter.
 ///
 typedef NavigatorIntCallback = void Function(int index);
@@ -53,7 +57,8 @@ enum NavigatorRoutePushHandleType {
 
 /// Signature of route push handler with RouteSettings.
 ///
-typedef NavigatorRoutePushHandle = Future<NavigatorRoutePushHandleType> Function(
+typedef NavigatorRoutePushHandle = Future<NavigatorRoutePushHandleType>
+    Function(
   RouteSettings settings, {
   bool animated,
 });

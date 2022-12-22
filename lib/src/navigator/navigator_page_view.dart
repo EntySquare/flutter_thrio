@@ -64,7 +64,8 @@ class NavigatorPageView extends StatefulWidget {
 
   final List<RouteSettings> routeSettings;
 
-  final Widget Function(BuildContext context, RouteSettings settings, Widget child)? childBuilder;
+  final Widget Function(
+      BuildContext context, RouteSettings settings, Widget child)? childBuilder;
 
   final String? parentUrl;
 
@@ -84,8 +85,9 @@ class NavigatorPageView extends StatefulWidget {
   State<NavigatorPageView> createState() => _NavigatorPageViewState();
 }
 
-// ignore: prefer_mixin
-class _NavigatorPageViewState extends State<NavigatorPageView> with WidgetsBindingObserver {
+class _NavigatorPageViewState extends State<NavigatorPageView>
+    with WidgetsBindingObserver // ignore: prefer_mixin
+{
   VoidCallback? _pageObserverCallback;
 
   late final controller = widget.controller ?? PageController();
@@ -112,7 +114,7 @@ class _NavigatorPageViewState extends State<NavigatorPageView> with WidgetsBindi
   void _changedToAppear(final RouteSettings routeSettings) {
     if (isAppeared) {
       appearFuture ??= Future.delayed(const Duration(milliseconds: 10), () {
-        final obs = anchor.pageLifecycleObservers[routeSettings.url!];
+        final obs = anchor.pageLifecycleObservers[routeSettings.url];
         for (final ob in obs) {
           if (ob is! _PageViewPageObserver) {
             ob.didAppear(routeSettings);
@@ -126,7 +128,7 @@ class _NavigatorPageViewState extends State<NavigatorPageView> with WidgetsBindi
   void _changedToDisappear(final RouteSettings routeSettings) {
     if (isAppeared) {
       disappearFuture ??= Future.delayed(const Duration(milliseconds: 10), () {
-        final obs = anchor.pageLifecycleObservers[routeSettings.url!];
+        final obs = anchor.pageLifecycleObservers[routeSettings.url];
         for (final ob in obs) {
           if (ob is! _PageViewPageObserver) {
             ob.didDisappear(routeSettings);
@@ -199,12 +201,13 @@ class _NavigatorPageViewState extends State<NavigatorPageView> with WidgetsBindi
         scrollBehavior: widget.scrollBehavior,
         padEnds: widget.padEnds,
         children: widget.routeSettings.map((final it) {
-          var w = ThrioNavigator.build(url: it.url!, params: it.params);
+          var w = ThrioNavigator.build(url: it.url, params: it.params);
           if (w == null) {
-            throw ArgumentError.value(it, 'routeSettings', 'invalid routeSettings');
+            throw ArgumentError.value(
+                it, 'routeSettings', 'invalid routeSettings');
           }
-          if(widget.childBuilder != null){
-            w = widget.childBuilder!(context, it ,w);
+          if (widget.childBuilder != null) {
+            w = widget.childBuilder!(context, it, w);
           }
           return w;
         }).toList(),
