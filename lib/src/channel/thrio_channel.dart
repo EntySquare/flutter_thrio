@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 
@@ -111,10 +112,14 @@ class ThrioChannel {
       ..setMethodCallHandler((final call) {
         final handler = _methodHandlers[call.method];
         final args = call.arguments;
-        ThrioLogger.v("===notify===${args.toString()}");
-        if (args is Map&&args["key"]=="notify_flutter") {
+        var notyParames= args;
+        if(Platform.isIOS){
+          notyParames= args["params"];
+        }
+        ThrioLogger.v("===notify===${notyParames.toString()}");
+        if (notyParames is Map&&notyParames["key"]=="notify_flutter") {
           if(notiveNotiFyCallback!=null){
-            notiveNotiFyCallback.notifyToNotify(args);
+            notiveNotiFyCallback.notifyToNotify(notyParames);
             return Future.value();
           }
         }
